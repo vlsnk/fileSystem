@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class Access {
+class Access implements FileAccess {
 
     private final Map<UserGroup, Set<Permission>> accessRights = new HashMap<>();
 
@@ -25,5 +25,10 @@ public class Access {
         }
         permissionSet.add(p);
         accessRights.put(group, permissionSet);
+    }
+
+    @Override
+    public FileAccess getDefault() {
+        return null;
     }
 }
