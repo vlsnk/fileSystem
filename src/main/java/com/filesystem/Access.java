@@ -1,34 +1,55 @@
 package com.filesystem;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import com.sun.istack.internal.NotNull;
+import java.util.Collection;
 
-class Access implements FileAccess {
+public interface Access {
 
-    private final Map<UserGroup, Set<Permission>> accessRights = new HashMap<>();
+    /**
+     * Create user or return user with this name
+     * @param name username
+     * @return user from users collection
+     */
+    User createUser(@NotNull String name);
 
-    public boolean hasAccess(Permission p, UserGroup group){
-        boolean result = false;
-        if (accessRights.containsKey(group)){
-            Set<Permission> pSet = accessRights.get(group);
-            if (pSet.contains(p)) result = true;
-        }
-        return result;
-    }
+    /**
+     * Add user to users collection or return user with this name
+     * @param user username
+     * @return user from users collection
+     */
+    User createUser(@NotNull User user);
 
-    public void setAccess(Permission p, UserGroup group){
-        Set<Permission> permissionSet = accessRights.get(group);
-        if (permissionSet == null) {
-            permissionSet = new HashSet<>();
-        }
-        permissionSet.add(p);
-        accessRights.put(group, permissionSet);
-    }
+    /**
+     * Create user and add to users collection or return user with this name
+     * Add user to groups collection
+     * @param name username
+     * @param group UserGroup
+     * @return user from users collection
+     */
+    User createUser(@NotNull String name, @NotNull UserGroup group);
 
-    @Override
-    public FileAccess getDefault() {
-        return null;
-    }
+    /**
+     * Create group or return group with this name
+     * @param name groupname
+     * @return group from groups collection
+     */
+    UserGroup createGroup(@NotNull String name);
+
+    /**
+     * Create group or return group with this name
+     * @param name groupname
+     * @param user add this user to new group
+     * @return group from groups collection
+     */
+    UserGroup createGroup(@NotNull String name, @NotNull User user);
+
+    /**
+     * @return all users
+     */
+    Collection<User> getUsers();
+
+    /**
+     * @return all groups
+     */
+    Collection<UserGroup> getGroups();
 }

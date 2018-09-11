@@ -8,11 +8,11 @@ public class VirtualFileSystem {
 
     private static VirtualFileSystem fileSystem;
     private VirtualDirectory root;
-    private Map<String, UserGroup> groups;
+    private Access accessManager;
 
     private VirtualFileSystem() {
         this.root = VirtualFileImpl.createRootDirectory("root");
-        this.groups = new HashMap<>();
+        accessManager = AccessManager.getInstance();
     }
 
     public static VirtualFileSystem getFileSystem() {
@@ -22,18 +22,8 @@ public class VirtualFileSystem {
         return fileSystem;
     }
 
-    public Collection<UserGroup> getUserGroups() {
-        VirtualFileSystem system = getFileSystem();
-        system.setGroups();
-        return groups.values();
-    }
-
     public VirtualDirectory getRoot() {
         return root;
     }
 
-    public void setGroups(){
-        UserGroup group = new UserGroup();
-        groups.put(group.getName(), group);
-    }
 }

@@ -5,28 +5,60 @@ import com.sun.javafx.binding.StringFormatter;
 
 import java.util.*;
 
+/**
+ * Virtual file implementation
+ *
+ */
 public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
 
     private VirtualDirectory parent;
     private String name;
     private boolean isDirectory;
-    private final Map<String, VFile> children;
+    private Map<String, VFile> children;
     private byte[] content;
-    private final Access access;
+    private FileAccess access;
     private static final String COPY = "_copy";
     private static final String FILE_EXISTS = "File with name - %s already exists";
+    private static final String WRONG_NAME = "File name is not valid";
 
-    public VirtualFileImpl(@NotNull VirtualDirectory parent, String name) {
+    /**
+     * Create VirtualFile
+     * @param parent parent virtual directory
+     * @param name file name
+     * @throws WrongNameException if name value is not valid (isEmpty or null)
+     */
+    public VirtualFileImpl(VirtualDirectory parent, String name) throws WrongNameException{
+        new VirtualFileImpl(parent, name, false);
+//        validateName(name);
+//        this.parent = parent;
+//        this.name = generateName(parent, name).toLowerCase();
+//        this.isDirectory = false;
+//        this.children = null;
+//        this.content = null;
+//        this.access = ((VirtualFileImpl) parent).getAccess();
+    }
+
+    /**
+     *
+     * @param parent parent virtual directory
+     * @param name file/directory name
+     * @param isDirectory
+     * @throws WrongNameException
+     */
+    public VirtualFileImpl(VirtualDirectory parent, String name, boolean isDirectory) throws WrongNameException {
+        validateName(name);
         this.parent = parent;
-        this.name = generateName(parent, name).toLowerCase();
-        this.isDirectory = false;
-        this.children = null;
+        this.name = generateName(parent,name).toLowerCase();
+        this.isDirectory = isDirectory;
+        this.children = new HashMap();
+        this.content = null;
         this.access = ((VirtualFileImpl) parent).getAccess();
     }
 
-    public VirtualFileImpl(@NotNull VirtualDirectory parent, String name, boolean isDirectory) {
+    public VirtualFileImpl(VirtualDirectory parent, String name, boolean isDirectory, FileAccess access) throws WrongNameException {
+        validateName(name);
         this.parent = parent;
-        this.name = generateName(parent,name).toLowerCase();
+        this.name = generateName(parent, name).toLowerCase();
         this.isDirectory = isDirectory;
         this.children = new HashMap();
         this.content = null;
@@ -44,16 +76,7 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
         this.isDirectory = true;
         this.children = new HashMap();
         this.content = null;
-        this.access = new Access();
-    }
-
-    public VirtualFileImpl(@NotNull VirtualDirectory parent, String name, boolean isDirectory, Access access) {
-        this.parent = parent;
-        this.name = generateName(parent, name).toLowerCase();
-        this.isDirectory = isDirectory;
-        this.children = new HashMap();
-        this.content = null;
-        this.access = ((VirtualFileImpl) parent).getAccess();
+        this.access = new FileAccessImpl();
     }
 
     /**
@@ -61,16 +84,16 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
      */
 
     @Override
-    public boolean hasAccess(@NotNull Permission p, @NotNull UserGroup group) {
-        return access.hasAccess(p, group);
+    public boolean hasAccess(Permission p,  UserInterface user) {
+        return access.hasAccess(p, user);
     }
 
     @Override
-    public void setAccess(@NotNull Permission p, @NotNull UserGroup group) {
-        this.access.setAccess(p, group);
+    public void setAccess(Permission p, UserInterface user) {
+        this.access.setAccess(p, user);
         if (isDirectory) {
             for (VFile vf : children.values()) {
-                vf.setAccess(p,group);
+                vf.setAccess(p,user);
             }
         }
     }
@@ -85,6 +108,7 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
      */
     @Override
     public VirtualFile createFile(String name) throws WrongNameException {
+        validateName(name);
         if (this.children.containsKey(name.toLowerCase()))
             throw new WrongNameException(StringFormatter.format(FILE_EXISTS, name).toString());
 
@@ -97,7 +121,7 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
 
     @Override
     public VirtualDirectory createDirectory(String name) throws WrongNameException {
-
+        validateName(name);
         VirtualDirectory vd = new VirtualFileImpl(this, name, true, this.access);
         if (vd != null) {
             children.put(vd.getName(), vd);
@@ -143,8 +167,12 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
         VFile implementation
      */
     @Override
-    public void rename(String newName) {
-        this.name = newName.toLowerCase();
+    public void rename(String newName) throws WrongNameException{
+        validateName(newName);
+        if ((parent != null) && !parent.hasFile(newName)){
+            this.name = newName.toLowerCase();
+        } else throw new WrongNameException(StringFormatter.format(FILE_EXISTS, name).toString());
+
     }
 
     @Override
@@ -158,8 +186,8 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
     }
 
     /**
-    Check if File\directory with this name is already exists in parent directory,
-    if true it generates new name
+    * Check if File\directory with this name is already exists in parent directory,
+    * if true it generates new name
      */
     private String generateName(VirtualDirectory dir, String name){
         String result = name;
@@ -169,12 +197,28 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
         return result;
     }
 
-    private Access getAccess(){
+    private FileAccess getAccess(){
         return this.access;
     }
 
+    /**
+     *
+     * @param name root directory name
+     * @return virtual directory
+     */
     public static VirtualDirectory createRootDirectory(String name) {
         VirtualDirectory vd = new VirtualFileImpl(name);
         return vd;
+    }
+
+    private void validateName(String name) throws WrongNameException {
+        if (!validName(name))
+            throw new WrongNameException(WRONG_NAME);
+    }
+    private boolean validName(String name) {
+        if ((name == null) || name.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

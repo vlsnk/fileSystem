@@ -1,9 +1,11 @@
 package com.filesystem;
 
-import javafx.beans.binding.StringExpression;
-
 public class WrongNameException extends Exception {
 
+    /**
+     * throws when virtual file/directory has wrong name value
+     * @param message
+     */
     public WrongNameException(String message) {
         super(message);
     }
