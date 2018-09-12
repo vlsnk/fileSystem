@@ -1,5 +1,8 @@
 package com.filesystem;
 
+import com.filesystem.implementation.FileAlreadyExistException;
+import com.filesystem.implementation.WrongNameException;
+
 public interface VFile extends FileAccess {
 
     /**
@@ -7,7 +10,7 @@ public interface VFile extends FileAccess {
      * @param newName
      * @throws WrongNameException if this name is already
      */
-    void rename(String newName) throws WrongNameException;
+    void rename(String newName) throws WrongNameException, FileAlreadyExistException;
 
     /**
      * @return file/group name
@@ -18,4 +21,6 @@ public interface VFile extends FileAccess {
      * @return true if virtual file is directory
      */
     boolean isDirectory();
+
+    public FileAccess getAccess();
 }

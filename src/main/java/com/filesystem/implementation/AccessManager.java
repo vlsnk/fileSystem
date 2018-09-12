@@ -1,6 +1,6 @@
-package com.filesystem;
+package com.filesystem.implementation;
 
-import com.sun.istack.internal.NotNull;
+import com.filesystem.Access;
 
 import java.util.*;
 
@@ -12,8 +12,9 @@ public class AccessManager implements Access {
     private static AccessManager instance;
     private Map<String, User> users;
     private Map<String, UserGroup> groups;
-    private final static String DEFAULT_USER = "DefaultUser";
-    private final static String DEFAULT_GROUP = "DefaultGroup";
+    private final static String DEFAULT_USER = "defaultuser";
+    private final static String DEFAULT_GROUP = "defaultdroup";
+    private static final String WRONG_NAME = "Name is not valid";
 
     /**
      * Constructor creates AccessManager
@@ -42,11 +43,22 @@ public class AccessManager implements Access {
      * @return user from users collection
      */
     @Override
-    public User createUser(@NotNull String name){
-        if (!users.containsKey(name)) {
+    public User createUser(String name) throws WrongNameException {
+        validateName(name);
+        if (!users.containsKey(name.toLowerCase())) {
             User user = new User(name);
             users.put(user.getName(), user);
         }
+        return users.get(name);
+    }
+
+    /**
+     * Search user with this name
+     * @param name username
+     * @return user from users collection or null
+     */
+    @Override
+    public User findUser(String name) {
         return users.get(name);
     }
 
@@ -55,8 +67,7 @@ public class AccessManager implements Access {
      * @param user username
      * @return user from users collection
      */
-    @Override
-    public User createUser(@NotNull User user) {
+    private User createUser(User user) {
         if (!users.containsKey(user.getName())) {
             users.put(user.getName(), user);
         }
@@ -71,7 +82,7 @@ public class AccessManager implements Access {
      * @return user from users collection
      */
     @Override
-    public User createUser(@NotNull String name, @NotNull UserGroup group) {
+    public User createUser(String name, UserGroup group) throws WrongNameException {
         User user = createUser(name);
         if (groups.containsKey(group.getName())){
             UserGroup g = groups.get(group.getName());
@@ -87,12 +98,23 @@ public class AccessManager implements Access {
      * @return group from groups collection
      */
     @Override
-    public UserGroup createGroup(@NotNull String name) {
-        if (!groups.containsKey(name)) {
+    public UserGroup createGroup(String name) throws WrongNameException {
+        validateName(name);
+        if (!groups.containsKey(name.toLowerCase())) {
             UserGroup g = new UserGroup(name);
             groups.put(g.getName(), g);
         }
         return groups.get(name);
+    }
+
+    /**
+     * Search group with this name
+     * @param name groupname
+     * @return group from groups collection or null
+     */
+    @Override
+    public UserGroup findGroup(String name) {
+        return groups.get(name.toLowerCase());
     }
 
 
@@ -103,12 +125,12 @@ public class AccessManager implements Access {
      * @return group from groups collection
      */
     @Override
-    public UserGroup createGroup(@NotNull String name, @NotNull User user) {
+    public UserGroup createGroup(String name, User user) throws WrongNameException {
         User u = createUser(user);
         UserGroup g = createGroup(name);
         g.addUser(u);
         groups.put(g.getName(), g);
-        return groups.get(name);
+        return groups.get(name.toLowerCase());
     }
 
     /**
@@ -125,5 +147,37 @@ public class AccessManager implements Access {
     @Override
     public Collection<UserGroup> getGroups() {
         return groups.values();
+    }
+
+    @Override
+    public User getDefaultUser() {
+        return users.get(DEFAULT_USER);
+    }
+
+    @Override
+    public UserGroup getDefaultGroup() {
+        return groups.get(DEFAULT_GROUP);
+    }
+
+    /**
+     * Check name is null or empty string
+     * @param name
+     * @throws WrongNameException if name is null or empty string
+     */
+    private void validateName(String name) throws WrongNameException{
+        if (!validName(name))
+            throw new WrongNameException(WRONG_NAME);
+    }
+
+    /**
+     * Check if name is null or empty string
+     * @param name
+     * @return false if name is null or empty string, or true
+     */
+    private boolean validName(String name) {
+        if ((name == null) || name.isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }

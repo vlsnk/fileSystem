@@ -1,5 +1,7 @@
 package com.filesystem;
 
+import com.filesystem.implementation.Permission;
+
 public interface FileAccess {
 
     /**

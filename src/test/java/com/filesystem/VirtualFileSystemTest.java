@@ -1,6 +1,7 @@
 package com.filesystem; 
 
-import org.junit.Test; 
+import com.filesystem.implementation.VirtualFileSystem;
+import org.junit.Test;
 import org.junit.Before; 
 import org.junit.After;
 

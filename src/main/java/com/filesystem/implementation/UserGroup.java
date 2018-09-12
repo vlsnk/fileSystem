@@ -1,5 +1,6 @@
-package com.filesystem;
+package com.filesystem.implementation;
 
+import com.filesystem.UserInterface;
 import com.sun.istack.internal.NotNull;
 
 import java.util.HashSet;
@@ -10,12 +11,8 @@ public class UserGroup implements UserInterface {
     private String name;
     private Set<User> users;
 
-//    public UserGroup() {
-//        this.name = "default";
-//        this.users = new HashSet<>();
-//    }
 
-    public UserGroup(@NotNull String name) {
+    public UserGroup(String name) {
         this.name = name.toLowerCase();
         this.users = new HashSet<>();
     }

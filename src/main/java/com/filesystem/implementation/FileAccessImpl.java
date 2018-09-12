@@ -1,4 +1,7 @@
-package com.filesystem;
+package com.filesystem.implementation;
+
+import com.filesystem.FileAccess;
+import com.filesystem.UserInterface;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,7 +20,7 @@ class FileAccessImpl implements FileAccess {
         boolean result = false;
         if (accessRights.containsKey(group)){
             Set<Permission> pSet = accessRights.get(group);
-            if (pSet.contains(p)) result = true;
+            if ((pSet != null) && pSet.contains(p)) result = true;
         }
         return result;
     }

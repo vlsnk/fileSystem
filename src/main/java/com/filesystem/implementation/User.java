@@ -1,4 +1,6 @@
-package com.filesystem;
+package com.filesystem.implementation;
+
+import com.filesystem.UserInterface;
 
 public class User implements UserInterface {
 

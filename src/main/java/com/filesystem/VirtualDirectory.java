@@ -1,5 +1,8 @@
 package com.filesystem;
 
+import com.filesystem.implementation.FileAlreadyExistException;
+import com.filesystem.implementation.WrongNameException;
+
 import java.util.Collection;
 
 public interface VirtualDirectory extends VFile {
@@ -10,7 +13,7 @@ public interface VirtualDirectory extends VFile {
      * @return created virtual file
      * @throws WrongNameException if file/directory with this name already exists inside virtual directory
      */
-    VirtualFile createFile(String name) throws WrongNameException;
+    VirtualFile createFile(String name) throws WrongNameException, FileAlreadyExistException;
 
     /**
      * Create new directory inside virtual directory
@@ -18,10 +21,10 @@ public interface VirtualDirectory extends VFile {
      * @return created virtual directory
      * @throws WrongNameException if file/directory with this name already exists inside virtual directory
      */
-    VirtualDirectory createDirectory(String name) throws WrongNameException;
+    VirtualDirectory createDirectory(String name) throws WrongNameException, FileAlreadyExistException;
 
     /**
-     * Search file/directory with this name inside virtual directory
+     * Search file/directory with this name inside virtual directory and sub-directories
      * @param name file/directory name
      * @return found file/directory or null if not exists
      */

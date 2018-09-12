@@ -1,4 +1,4 @@
-package com.filesystem;
+package com.filesystem.implementation;
 
 /**
  * Permissions for VirtualFile

@@ -1,16 +1,15 @@
 package com.filesystem;
 
+import com.filesystem.implementation.VirtualFileImpl;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class VirtualFileImplTest {
 
     VirtualDirectory root;
     @Before
     public void setUp() throws Exception {
-        root = VirtualFileImpl.createRootDirectory("root");
+//        root = VirtualFileImpl.createRootDirectory("root");
     }
 
     @Test
