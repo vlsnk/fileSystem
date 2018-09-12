@@ -12,7 +12,7 @@ public class UserGroup implements UserInterface {
     private Set<User> users;
 
 
-    public UserGroup(String name) {
+    UserGroup(String name) {
         this.name = name.toLowerCase();
         this.users = new HashSet<>();
     }
@@ -30,4 +30,11 @@ public class UserGroup implements UserInterface {
         this.users.add(user);
     }
 
+    public void removeUser(User user){
+        this.users.remove(user);
+    }
+
+    public boolean containUser(User user){
+        return users.contains(user);
+    }
 }

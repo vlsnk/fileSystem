@@ -1,6 +1,7 @@
 package com.filesystem.implementation;
 
 import com.filesystem.Access;
+import com.filesystem.UserInterface;
 
 import java.util.*;
 
@@ -13,7 +14,7 @@ public class AccessManager implements Access {
     private Map<String, User> users;
     private Map<String, UserGroup> groups;
     private final static String DEFAULT_USER = "defaultuser";
-    private final static String DEFAULT_GROUP = "defaultdroup";
+    private final static String DEFAULT_GROUP = "defaultgroup";
     private static final String WRONG_NAME = "Name is not valid";
 
     /**
@@ -30,7 +31,7 @@ public class AccessManager implements Access {
         groups.put(defGroup.getName(), defGroup);
     }
 
-    public static AccessManager getInstance(){
+    static AccessManager getInstance(){
         if (instance == null) {
             instance = new AccessManager();
         }
@@ -49,9 +50,46 @@ public class AccessManager implements Access {
             User user = new User(name);
             users.put(user.getName(), user);
         }
-        return users.get(name);
+        return users.get(name.toLowerCase());
     }
 
+    /**
+     * remove user/group? return removed object
+     * @param u UserInterface object
+     */
+    @Override
+    public UserInterface removeUser(UserInterface u) {
+        if (u instanceof User) {
+            return removeUser((User) u);
+        } else {
+            return removeGroup((UserGroup) u);
+        }
+    }
+
+    /**
+     * remove user
+     * @param u User object
+     */
+    private User removeUser(User u){
+        User user = users.get(u.getName());
+        if (user != null) {
+            for (UserGroup g : groups.values()) {
+                if (g.containUser(user))
+                    g.removeUser(user);
+            }
+            users.remove(user.getName());
+        }
+        return user;
+    }
+
+    /**
+     * remove group
+     * @param g UserGroup object
+     */
+    private UserGroup removeGroup(UserGroup g) {
+        UserGroup group = groups.remove(g.getName());
+        return group;
+    }
     /**
      * Search user with this name
      * @param name username
@@ -59,7 +97,7 @@ public class AccessManager implements Access {
      */
     @Override
     public User findUser(String name) {
-        return users.get(name);
+        return users.get(name.toLowerCase());
     }
 
     /**
@@ -104,8 +142,21 @@ public class AccessManager implements Access {
             UserGroup g = new UserGroup(name);
             groups.put(g.getName(), g);
         }
-        return groups.get(name);
+        return groups.get(name.toLowerCase());
     }
+
+    /**
+     * Add user to users collection or return user with this name
+     * @param group groupname
+     * @return user from users collection
+     */
+    private UserGroup createGroup(UserGroup group) {
+        if (!groups.containsKey(group.getName())) {
+            groups.put(group.getName(), group);
+        }
+        return groups.get(group.getName());
+    }
+
 
     /**
      * Search group with this name
@@ -160,6 +211,52 @@ public class AccessManager implements Access {
     }
 
     /**
+     * add user to group
+     * @param user
+     * @param group
+     */
+    @Override
+    public void addToGroup(User user, UserGroup group) {
+        UserGroup g = groups.get(group.getName());
+        if (g == null){
+            g = createGroup(group);
+        }
+        User u = users.get(user.getName());
+        if (u == null) {
+            u = createUser(user);
+        }
+        g.addUser(u);
+    }
+
+    /**
+     * remove user from group
+     * @param user
+     * @param group
+     */
+    @Override
+    public void removeFromGroup(User user, UserGroup group) {
+        UserGroup g = groups.get(group.getName());
+        if (g == null){
+            g = createGroup(group);
+        }
+        User u = users.get(user.getName());
+        if (u == null) {
+            u = createUser(user);
+        }
+        g.removeUser(u);
+    }
+
+    @Override
+    public boolean consistIn(User user, UserGroup group) {
+        UserGroup g = groups.get(group.getName());
+        User u = users.get(user.getName());
+        if (g.getUsers().contains(u)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Check name is null or empty string
      * @param name
      * @throws WrongNameException if name is null or empty string
@@ -175,9 +272,12 @@ public class AccessManager implements Access {
      * @return false if name is null or empty string, or true
      */
     private boolean validName(String name) {
-        if ((name == null) || name.isEmpty()) {
-            return false;
+        if (name != null){
+            String n = name.replaceAll("\\s+","");
+            if (!n.isEmpty()) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 }

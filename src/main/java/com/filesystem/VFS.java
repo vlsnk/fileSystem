@@ -20,4 +20,9 @@ public interface VFS {
      */
     VFile findFile(String name);
 
+    /**
+     * remove user/group, delete it from access
+     * @param u
+     */
+    void removeUser(UserInterface u);
 }

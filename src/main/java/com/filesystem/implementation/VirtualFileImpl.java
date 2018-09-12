@@ -18,7 +18,7 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
     private byte[] content;
     private FileAccess access;
     private static final String COPY = "_copy";
-    private static final String FILE_EXISTS = "File with name - %s already exists";
+    private static final String FILE_EXISTS = "File with this name already exists";
     private static final String WRONG_NAME = "File name is not valid";
 
     /**
@@ -44,9 +44,7 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
             this.children = new HashMap();
         }
         this.content = null;
-//        VirtualFileImpl p = (VirtualFileImpl) parent;
-        this.access = parent.getAccess();
-        System.out.println("hello");
+        this.access = FileAccessImpl.copyAccess(parent.getAccess());
     }
 
     /**
@@ -72,6 +70,11 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
         return access.hasAccess(p, user);
     }
 
+    /**
+     * set permission for user/group to access this file/directory(and its children)
+     * @param p Permission
+     * @param user user/group object
+     */
     @Override
     public void setAccess(Permission p, UserInterface user) {
         this.access.setAccess(p, user);
@@ -80,6 +83,36 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
                 vf.setAccess(p,user);
             }
         }
+    }
+
+    /**
+     * remove permission for user/group to access this file/directory(and its children)
+     * @param p Permission level
+     * @param user user/group object
+     */
+    @Override
+    public void removeAccess(Permission p, UserInterface user) {
+        this.access.removeAccess(p, user);
+        if (isDirectory) {
+            for (VFile vf : children.values()) {
+                vf.removeAccess(p,user);
+            }
+        }
+    }
+
+    /**
+     * remove all permission for user/group to access this file/directory(and its children)
+     * @param user user/group object
+     */
+    @Override
+    public void removeAccess(UserInterface user) {
+        this.access.removeAccess(user);
+        if (isDirectory) {
+            for (VFile vf : children.values()) {
+                vf.removeAccess(user);
+            }
+        }
+
     }
 
     @Override
@@ -115,11 +148,14 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
 
     @Override
     public VFile getFile(String name) {
+        if (this.name.equalsIgnoreCase(name))
+            return this;
         VFile result = this.children.get(name);
         if (result == null){
             for (VFile f : this.children.values()) {
                 if (f.isDirectory()){
                     result = ((VirtualDirectory) f).getFile(name);
+                    if (result != null) break;
                 }
             }
         }
@@ -213,7 +249,7 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
         if (!validName(name))
             throw new WrongNameException(WRONG_NAME);
         if ((this.children != null) && this.children.containsKey(name.toLowerCase()))
-            throw new FileAlreadyExistException(StringFormatter.format(FILE_EXISTS, name).toString());
+            throw new FileAlreadyExistException(FILE_EXISTS);
 
     }
 
@@ -223,9 +259,12 @@ public class VirtualFileImpl implements VirtualFile, VirtualDirectory {
      * @return false if name is null or empty string, or true
      */
     private boolean validName(String name) {
-        if ((name == null) || name.isEmpty()) {
-            return false;
+        if (name != null){
+            String n = name.replaceAll("\\s+","");
+            if (!n.isEmpty()) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 }

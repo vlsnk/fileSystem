@@ -17,9 +17,17 @@ public interface Access {
     User createUser(String name) throws WrongNameException;
 
     /**
+     * remove user
+     * @param name
+     * @throws WrongNameException if group name is null or empty string
+     */
+    UserInterface removeUser(UserInterface name);
+
+    /**
      * Search user with this name
      * @param name username
      * @return user from users collection or null
+     * @throws NullPointerException if user name is null or empty string
      */
     User findUser(String name);
 
@@ -78,4 +86,27 @@ public interface Access {
      * @return default group
      */
     UserGroup getDefaultGroup();
+
+    /**
+     * add user to group
+     * @param user
+     * @param group
+     */
+    void addToGroup(User user, UserGroup group);
+
+    /**
+     * remove user from group
+     * @param user
+     * @param group
+     */
+    void removeFromGroup(User user, UserGroup group);
+
+    /**
+     * Check if user consists in group
+     * @param user
+     * @param group
+     * @return
+     */
+    boolean consistIn(User user, UserGroup group);
+
 }

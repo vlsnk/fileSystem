@@ -1,9 +1,6 @@
 package com.filesystem.implementation;
 
-import com.filesystem.Access;
-import com.filesystem.VFS;
-import com.filesystem.VFile;
-import com.filesystem.VirtualDirectory;
+import com.filesystem.*;
 
 public class VirtualFileSystem implements VFS {
 
@@ -48,7 +45,17 @@ public class VirtualFileSystem implements VFS {
      */
     @Override
     public VFile findFile(String name) {
+
         return root.getFile(name);
     }
 
+    /**
+     * remove access to all files in virtual file system for user
+     * @param user
+     */
+    @Override
+    public void removeUser(UserInterface user){
+        UserInterface u = accessManager.removeUser(user);
+        root.removeAccess(u);
+    }
 }
