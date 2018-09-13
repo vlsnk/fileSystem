@@ -18,7 +18,7 @@ public class VirtualFileImplTest {
 
     @BeforeAll
     public static void setUp() throws Exception {
-        VFSTest.initVFS(system, list);
+        VFSTest.initVFS(list);
         Access access = system.getAccess();
         // in group
         User user1 = access.createUser("user1");
@@ -90,7 +90,7 @@ public class VirtualFileImplTest {
      */
     @Test
     public void hasAccessChildren() {
-        VirtualDirectory dir = (VirtualDirectory) list.get(6);
+        VirtualDirectory dir = (VirtualDirectory) system.getRoot().getFile("new2");
         Collection<VFile> children = dir.getAllFiles();
         for (VFile f : children) {
             assertFalse(f.hasAccess(Permission.EXECUTE, userList.get(3)));
@@ -107,7 +107,7 @@ public class VirtualFileImplTest {
      */
     @Test
     public void hasAccessAfterCreation() {
-        VirtualDirectory dir = (VirtualDirectory) list.get(6);
+        VirtualDirectory dir = (VirtualDirectory) system.getRoot().getFile("new2");;
         UserGroup group = system.getAccess().getDefaultGroup();
         Permission p = Permission.EXECUTE;
         dir.setAccess(p, group);
@@ -123,7 +123,7 @@ public class VirtualFileImplTest {
     @Test
     @SuppressWarnings("unchecked")
     public void setAccessGroup() {
-        VirtualDirectory file = (VirtualDirectory) list.get(0);
+        VirtualDirectory file = (VirtualDirectory) system.getRoot().getFile("new");;
         Permission p = Permission.EXECUTE;
         User u = (User) userList.get(6);
         UserGroup g = (UserGroup) userList.get(7);
@@ -139,7 +139,7 @@ public class VirtualFileImplTest {
     @Test
     @SuppressWarnings("unchecked")
     public void setAccess() {
-        VirtualDirectory file = (VirtualDirectory) list.get(6);
+        VirtualDirectory file = (VirtualDirectory) system.getRoot().getFile("new2");
         Permission p = Permission.EXECUTE;
         User u = (User) userList.get(2);
         file.setAccess(p, u);
@@ -154,7 +154,7 @@ public class VirtualFileImplTest {
      */
     @Test
     public void removeAccess(){
-        VirtualDirectory file = (VirtualDirectory) list.get(0);
+        VirtualDirectory file = (VirtualDirectory) system.getRoot().getFile("new");
         Permission p = Permission.EXECUTE;
         User u = system.getAccess().getDefaultUser();
         file.setAccess(p, system.getAccess().getDefaultGroup());

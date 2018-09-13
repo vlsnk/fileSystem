@@ -25,7 +25,6 @@ class FileAccessImpl implements FileAccess {
         this.accessRights = rights;
     }
 
-
     /**
      * check if user/group has permission to access this file/directory
      * @param p Permission
@@ -79,6 +78,11 @@ class FileAccessImpl implements FileAccess {
         return null;
     }
 
+    /**
+     * Create new copy of FileAccess object
+     * @param oldAccess object that need to be copy
+     * @return copy
+     */
     static FileAccess copyAccess(FileAccess oldAccess){
         Map<UserInterface, Set<Permission>> oldRights = ((FileAccessImpl) oldAccess).accessRights;
         Map<UserInterface, Set<Permission>> newRights = new HashMap<>();

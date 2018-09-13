@@ -58,4 +58,5 @@ public class VirtualFileSystem implements VFS {
         UserInterface u = accessManager.removeUser(user);
         root.removeAccess(u);
     }
+
 }

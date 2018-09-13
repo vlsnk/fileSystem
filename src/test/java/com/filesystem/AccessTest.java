@@ -21,7 +21,7 @@ public class AccessTest {
 
     @BeforeAll
     public static void setUp() throws Exception {
-        VFSTest.initVFS(system, list);
+        VFSTest.initVFS(list);
         manager = system.getAccess();
     }
 
@@ -41,6 +41,7 @@ public class AccessTest {
 
     /**
      * try to create user with empty or null name
+     * WrongNameException will be throw
      */
     @Test
     public void createUser_NullEmpty() {
@@ -109,6 +110,7 @@ public class AccessTest {
 
     /**
      * try to create group with empty or null name
+     * WrongNameException will be thrown
      */
     @Test
     public void createGroup1() {
@@ -169,6 +171,10 @@ public class AccessTest {
 
     }
 
+    /**
+     * Check than defaultuser consists in defaultgroup
+     * and default doesn't consist in defaultgroup
+     */
     @Test
     public void consistIn() {
         User user = manager.getDefaultUser();

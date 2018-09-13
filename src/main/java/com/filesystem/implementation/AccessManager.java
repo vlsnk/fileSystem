@@ -200,11 +200,19 @@ public class AccessManager implements Access {
         return groups.values();
     }
 
+    /**
+     *
+     * @return default user
+     */
     @Override
     public User getDefaultUser() {
         return users.get(DEFAULT_USER);
     }
 
+    /**
+     * Default group contains default user
+     * @return default group
+     */
     @Override
     public UserGroup getDefaultGroup() {
         return groups.get(DEFAULT_GROUP);
@@ -246,6 +254,12 @@ public class AccessManager implements Access {
         g.removeUser(u);
     }
 
+    /**
+     * Check if user consists in group
+     * @param user
+     * @param group
+     * @return
+     */
     @Override
     public boolean consistIn(User user, UserGroup group) {
         UserGroup g = groups.get(group.getName());
